@@ -1,0 +1,18 @@
+﻿{
+  "name": "CampusMate - Smart College Companion",
+  "short_name": "CampusMate",
+  "description": "Smart college companion for academic management, AI learning, QR attendance, reports, analytics, and campus workflows.",
+  "start_url": "/",
+  "scope": "/",
+  "display": "standalone",
+  "background_color": "#060913",
+  "theme_color": "#07101f",
+  "icons": [
+    {
+      "src": "/icons/icon.svg",
+      "sizes": "any",
+      "type": "image/svg+xml",
+      "purpose": "any maskable"
+    }
+  ]
+}
