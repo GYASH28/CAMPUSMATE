@@ -5,6 +5,30 @@ export function normalizeRole(role) {
     : 'student';
 }
 
+export function normalizeEmail(email = '') {
+  return String(email).trim().toLowerCase();
+}
+
+export const RESERVED_ADMIN_EMAILS = [
+  'ultimatebracegaming@gmail.com',
+];
+
+export function isReservedAdminEmail(email) {
+  return RESERVED_ADMIN_EMAILS.includes(normalizeEmail(email));
+}
+
+export function enforceReservedAdminProfile(profile = {}) {
+  if (!isReservedAdminEmail(profile.email)) return profile;
+
+  return {
+    ...profile,
+    role: 'admin',
+    status: 'active',
+    isCR: false,
+    profileComplete: true,
+  };
+}
+
 export function getDashboardPath(role) {
   const normalized = normalizeRole(role);
   if (normalized === 'admin') return '/admin/dashboard';

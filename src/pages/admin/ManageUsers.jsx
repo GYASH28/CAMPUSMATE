@@ -14,7 +14,13 @@ import { useToast } from '../../context/ToastContext';
 import { addDocument, setDocumentWithId, updateDocument } from '../../firebase/firestore';
 import useCollection from '../../hooks/useCollection';
 import { BRANCHES, DEPARTMENTS, DIVISIONS, ROLES, SAMPLE_BRANCH, SAMPLE_DIVISION, SAMPLE_SEMESTER, SEMESTERS } from '../../utils/constants';
-import { canAssignRole, getRoleLabel, normalizeRole, validateRollNumber } from '../../utils/authUtils';
+import {
+  canAssignRole,
+  getRoleLabel,
+  isReservedAdminEmail,
+  normalizeRole,
+  validateRollNumber,
+} from '../../utils/authUtils';
 import { statusTone } from '../../utils/roleUtils';
 
 const initialInvite = {
@@ -55,6 +61,10 @@ export default function ManageUsers() {
 
   const updateUser = async (user, updates) => {
     try {
+      if (isReservedAdminEmail(user.email) && (updates.role || updates.status)) {
+        notify('This reserved admin account cannot be downgraded or disabled.', 'error');
+        return;
+      }
       const payload = updates.role
         ? { ...updates, role: normalizeRole(updates.role), isCR: normalizeRole(updates.role) === 'cr' }
         : updates;
@@ -283,15 +293,28 @@ export default function ManageUsers() {
                   <div className="flex flex-wrap gap-2">
                     <Badge tone={['admin', 'coordinator'].includes(item.role) ? 'violet' : item.role === 'teacher' ? 'cyan' : 'emerald'}>{getRoleLabel(item.role)}</Badge>
                     <Badge tone={statusTone(item.status || 'active')}>{item.status || 'active'}</Badge>
+                    {isReservedAdminEmail(item.email) ? (
+                      <Badge tone="emerald" icon={ShieldCheck}>Protected admin</Badge>
+                    ) : null}
                   </div>
                   <h3 className="mt-3 text-xl font-black text-white">{item.name}</h3>
                   <p className="mt-1 text-sm text-slate-400">{item.email}</p>
                 </div>
                 <div className="grid gap-3 md:grid-cols-3">
-                  <Select label="Role" value={item.role || 'student'} onChange={(event) => updateUser(item, { role: event.target.value })}>
+                  <Select
+                    label="Role"
+                    value={isReservedAdminEmail(item.email) ? 'admin' : item.role || 'student'}
+                    onChange={(event) => updateUser(item, { role: event.target.value })}
+                    disabled={isReservedAdminEmail(item.email)}
+                  >
                     {ROLES.map((role) => <option key={role} value={role}>{getRoleLabel(role)}</option>)}
                   </Select>
-                  <Select label="Status" value={item.status || 'active'} onChange={(event) => updateUser(item, { status: event.target.value })}>
+                  <Select
+                    label="Status"
+                    value={isReservedAdminEmail(item.email) ? 'active' : item.status || 'active'}
+                    onChange={(event) => updateUser(item, { status: event.target.value })}
+                    disabled={isReservedAdminEmail(item.email)}
+                  >
                     <option value="active">active</option>
                     <option value="disabled">disabled</option>
                   </Select>
@@ -305,7 +328,7 @@ export default function ManageUsers() {
                     {DIVISIONS.map((division) => <option key={division}>{division}</option>)}
                   </Select>
                   <Input label="Roll number" value={item.rollNumber || ''} onChange={(event) => updateUser(item, { rollNumber: event.target.value })} placeholder="254101" inputMode="numeric" />
-                  {['student', 'cr'].includes(normalizeRole(item.role)) ? (
+                  {['student', 'cr'].includes(normalizeRole(item.role)) && !isReservedAdminEmail(item.email) ? (
                     <Button type="button" variant="secondary" onClick={() => assignAsCr(item)}>
                       <UserCheck className="h-4 w-4" />
                       Assign as CR

@@ -22,7 +22,14 @@ import {
   SAMPLE_DIVISION,
   SAMPLE_SEMESTER,
 } from '../utils/constants';
-import { devAuthError, devAuthLog, mapFirebaseError, normalizeRole } from '../utils/authUtils';
+import {
+  devAuthError,
+  devAuthLog,
+  enforceReservedAdminProfile,
+  isReservedAdminEmail,
+  mapFirebaseError,
+  normalizeRole,
+} from '../utils/authUtils';
 
 function requireDb() {
   if (!db) throw new Error(firebaseMissingMessage);
@@ -40,24 +47,25 @@ function timestampOrNow(value) {
 
 function buildUserProfile(uid, profile = {}) {
   const now = serverTimestamp();
+  const securedProfile = enforceReservedAdminProfile(profile);
   return {
     uid,
-    name: profile.name || 'CampusMate User',
-    email: profile.email || '',
-    role: normalizeRole(profile.role),
-    branch: profile.branch || 'Computer Engineering & IoT',
-    semester: String(profile.semester || '2'),
-    division: profile.division || 'A',
-    rollNumber: profile.rollNumber || '',
-    department: profile.department || 'Computer Engineering',
-    assignedSubjects: profile.assignedSubjects || [],
-    isCR: profile.isCR ?? normalizeRole(profile.role) === 'cr',
-    assignedBy: profile.assignedBy || '',
-    assignedAt: profile.assignedAt || null,
-    provider: profile.provider || 'password',
-    status: profile.status || 'active',
-    profileComplete: profile.profileComplete ?? true,
-    createdAt: timestampOrNow(profile.createdAt),
+    name: securedProfile.name || 'CampusMate User',
+    email: securedProfile.email || '',
+    role: normalizeRole(securedProfile.role),
+    branch: securedProfile.branch || 'Computer Engineering & IoT',
+    semester: String(securedProfile.semester || '2'),
+    division: securedProfile.division || 'A',
+    rollNumber: securedProfile.rollNumber || '',
+    department: securedProfile.department || 'Computer Engineering',
+    assignedSubjects: securedProfile.assignedSubjects || [],
+    isCR: securedProfile.isCR ?? normalizeRole(securedProfile.role) === 'cr',
+    assignedBy: securedProfile.assignedBy || '',
+    assignedAt: securedProfile.assignedAt || null,
+    provider: securedProfile.provider || 'password',
+    status: securedProfile.status || 'active',
+    profileComplete: securedProfile.profileComplete ?? true,
+    createdAt: timestampOrNow(securedProfile.createdAt),
     updatedAt: now,
   };
 }
@@ -88,9 +96,15 @@ export async function getUserProfile(uid, { retry = true } = {}) {
 
 export async function updateUserProfile(uid, updates) {
   const instance = requireDb();
-  const payload = {
+  const currentSnapshot = await getDoc(doc(instance, 'users', uid));
+  const currentProfile = currentSnapshot.exists() ? currentSnapshot.data() : {};
+  const securedUpdates = enforceReservedAdminProfile({
     ...updates,
-    ...(updates.role ? { role: normalizeRole(updates.role) } : {}),
+    email: updates.email || currentProfile.email,
+  });
+  const payload = {
+    ...securedUpdates,
+    ...(securedUpdates.role ? { role: normalizeRole(securedUpdates.role) } : {}),
     updatedAt: serverTimestamp(),
   };
   await updateDoc(doc(instance, 'users', uid), payload);
@@ -149,9 +163,13 @@ export async function ensureUserProfile(user, options = {}) {
   devAuthLog('Ensuring profile for uid:', user.uid);
   const existing = await getUserProfile(user.uid);
   if (existing) {
-    const normalized = normalizeRole(existing.role);
+    const reservedAdmin = isReservedAdminEmail(existing.email) || isReservedAdminEmail(user.email);
+    const normalized = reservedAdmin ? 'admin' : normalizeRole(existing.role);
     const patch = {};
     if (existing.role !== normalized) patch.role = normalized;
+    if (reservedAdmin && existing.status !== 'active') patch.status = 'active';
+    if (reservedAdmin && existing.isCR) patch.isCR = false;
+    if (reservedAdmin && !existing.profileComplete) patch.profileComplete = true;
     if (!existing.status) patch.status = 'active';
     if (!existing.provider) patch.provider = provider;
     if (!existing.updatedAt) patch.updatedAt = serverTimestamp();
@@ -167,7 +185,7 @@ export async function ensureUserProfile(user, options = {}) {
   const rebuilt = await createUserProfile(user.uid, {
     name: defaults.name || user.displayName || 'CampusMate User',
     email: defaults.email || user.email || '',
-    role: defaults.role || role,
+    role: isReservedAdminEmail(defaults.email || user.email) ? 'admin' : defaults.role || role,
     branch: defaults.branch || 'Computer Engineering & IoT',
     semester: defaults.semester || '2',
     division: defaults.division || 'A',
@@ -230,6 +248,21 @@ export async function setDocumentWithId(collectionName, id, data) {
 
 export async function updateDocument(collectionName, id, updates) {
   const instance = requireDb();
+  if (collectionName === 'users') {
+    const currentSnapshot = await getDoc(doc(instance, collectionName, id));
+    const currentProfile = currentSnapshot.exists() ? currentSnapshot.data() : {};
+    if (isReservedAdminEmail(currentProfile.email || updates.email)) {
+      await updateDoc(doc(instance, collectionName, id), {
+        ...updates,
+        role: 'admin',
+        status: 'active',
+        isCR: false,
+        profileComplete: true,
+        updatedAt: serverTimestamp(),
+      });
+      return;
+    }
+  }
   await updateDoc(doc(instance, collectionName, id), {
     ...updates,
     updatedAt: serverTimestamp(),
@@ -238,6 +271,12 @@ export async function updateDocument(collectionName, id, updates) {
 
 export async function deleteDocument(collectionName, id) {
   const instance = requireDb();
+  if (collectionName === 'users') {
+    const currentSnapshot = await getDoc(doc(instance, collectionName, id));
+    if (currentSnapshot.exists() && isReservedAdminEmail(currentSnapshot.data().email)) {
+      throw new Error('This reserved admin account cannot be removed.');
+    }
+  }
   await deleteDoc(doc(instance, collectionName, id));
 }
 
