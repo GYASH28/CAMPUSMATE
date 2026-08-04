@@ -1,180 +1,139 @@
+<div align="center">
+
 # 🎓 CampusMate
 
-> Smart College Companion Platform
+### A smart college companion for students, teachers, CRs, coordinators, and administrators
 
-CampusMate is a futuristic AI-powered college management and student productivity platform designed to simplify academic workflows for students, teachers, coordinators/HODs, class representatives, and administrators.
+[![React](https://img.shields.io/badge/React-19-61DAFB?style=for-the-badge&logo=react&logoColor=111827)](https://react.dev)
+[![Firebase](https://img.shields.io/badge/Firebase-Backend-FFCA28?style=for-the-badge&logo=firebase&logoColor=111827)](https://firebase.google.com)
+[![Vite](https://img.shields.io/badge/Vite-7-646CFF?style=for-the-badge&logo=vite&logoColor=white)](https://vite.dev)
+[![PWA](https://img.shields.io/badge/PWA-Ready-5A0FC8?style=for-the-badge&logo=pwa&logoColor=white)](#progressive-web-app)
 
-Built with a modern SaaS-inspired interface, CampusMate combines attendance management, timetable tracking, assignments, notes, notices, exams, quizzes, academic analytics, and AI-powered learning tools into one unified platform.
+</div>
 
----
+## Overview
 
-# ✨ Features
+**CampusMate** is a multi-role college management and student-productivity platform designed to bring everyday academic workflows into one modern application.
 
-## 👨‍🎓 Student Features
+Instead of making students and faculty jump between attendance sheets, messages, timetables, notices, assignments, and disconnected portals, CampusMate provides a single responsive workspace with role-based dashboards and real-time Firebase data.
 
-- Official attendance tracking
-- Subject-wise attendance analytics
-- Timetable management
+> **Status:** Active development and product exploration.
+
+## Product Highlights
+
+- Unified student, teacher, CR, coordinator/HOD, and admin experiences
+- Official subject-wise attendance tracking and analytics
+- Timetables, notices, assignments, notes, exams, and reminders
+- Role-based permissions and dedicated dashboards
+- Academic progress charts and report-ready data
+- AI-assisted study and productivity workflows
+- Responsive, installable Progressive Web App experience
+- Modern dark interface with motion and dashboard visualizations
+
+## Role-Based Experience
+
+| Role | Core capabilities |
+|---|---|
+| **Student** | View attendance, timetable, notes, assignments, notices, exams, quizzes, reminders, and progress |
+| **Teacher** | Take attendance, manage classes, upload academic content, create quizzes, and review student performance |
+| **Class Representative** | Support assigned-class attendance and communication while retaining student access |
+| **Coordinator / HOD** | Assign academic responsibilities, monitor classes, publish notices, and review department analytics |
+| **Admin** | Manage users, roles, subjects, timetables, reports, platform data, and demo setup |
+
+## Core Modules
+
+### Attendance
+
+Authorized roles can mark students present or absent, while students can review subject-wise percentages, history, and attendance risk.
+
+### Academic Workspace
+
+CampusMate brings together:
+
+- Timetables
 - Notes and study materials
 - Assignments and submissions
 - Notices and announcements
 - Exam schedules and countdowns
-- Quiz system
-- Academic progress tracking
-- Reminder system
-- AI-powered academic assistant
-- Responsive mobile-friendly dashboard
-- PWA support
+- Quizzes and academic reminders
 
----
+### Analytics
 
-## 👨‍🏫 Teacher Features
+Charts and progress views help users understand attendance, academic performance, and overall engagement without reading raw tables.
 
-- Take attendance
-- Manage assigned classes
-- View timetable
-- Upload notes and assignments
-- Manage quizzes
-- Track student attendance and progress
-- View reports and analytics
+### AI Assistance
 
----
+The product is designed to support topic explanations, study help, quiz assistance, and academic productivity workflows from inside the same dashboard.
 
-## 🧑‍💼 Coordinator / HOD Features
+## Technology Stack
 
-- Higher-level academic management
-- Assign teachers to subjects
-- Assign Class Representatives (CR)
-- Monitor attendance
-- View department/class analytics
-- Manage notices and reports
-- View student performance
+| Area | Technology |
+|---|---|
+| Frontend | React 19, Vite 7, React Router 7 |
+| Styling | Tailwind CSS, responsive layouts, custom dashboard UI |
+| Motion | Framer Motion |
+| Backend services | Firebase Authentication, Cloud Firestore, Firebase Storage |
+| Visualization | Recharts |
+| Documents | jsPDF |
+| QR workflows | html5-qrcode, qrcode.react |
+| Icons | Lucide React |
+| Quality | ESLint |
 
----
+## Quick Start
 
-## 👨‍💻 Class Representative (CR) Features
+### Prerequisites
 
-- Take attendance for assigned class
-- View class students
-- Manage class updates
-- Access student dashboard features
-- View timetable and notices
+- Node.js 20 or newer
+- npm
+- A Firebase project for authentication and application data
 
----
-
-## 🛡️ Admin Features
-
-- Full platform management
-- User and role management
-- Subject and timetable management
-- Attendance overview
-- Reports and analytics
-- Manage coordinators, teachers, CRs, and students
-- Demo data seeding
-
----
-
-# 🚀 Tech Stack
-
-## Frontend
-- React
-- Vite
-- Tailwind CSS
-- Framer Motion
-
-## Backend / Services
-- Firebase Authentication
-- Cloud Firestore
-- Firebase Storage
-
-## Additional Features
-- Progressive Web App (PWA)
-- AI Integration
-- Role-Based Access Control
-- Real-Time Data Updates
-
----
-
-# 🔐 Roles
-
-CampusMate supports 5 user roles:
-
-| Role | Access Level |
-|------|------|
-| Admin | Full control |
-| Coordinator / HOD | Department-level control |
-| Teacher | Academic management |
-| Class Representative (CR) | Limited class management |
-| Student | Academic access |
-
----
-
-# 📋 Attendance System
-
-CampusMate uses a practical official attendance system.
-
-Authorized users:
-- Teacher
-- Coordinator/HOD
-- CR
-- Admin
-
-can mark students:
-- Present
-- Absent
-
-Students can:
-- View official attendance
-- View subject-wise percentages
-- Track attendance status
-- See attendance history
-
----
-
-# 📱 Progressive Web App (PWA)
-
-CampusMate supports PWA installation.
-
-Users can:
-- Install CampusMate like a mobile app
-- Access it from home screen
-- Use responsive mobile experience
-
----
-
-# 🎨 UI/UX
-
-CampusMate uses:
-- Dark futuristic theme
-- Glassmorphism design
-- Neon blue-purple gradients
-- Smooth animations
-- Modern SaaS-inspired interface
-
----
-
-# 🧠 AI Features
-
-CampusMate includes AI-powered academic tools such as:
-- Topic explanations
-- Study assistance
-- Quiz support
-- Academic productivity tools
-
----
-
-# 📂 Project Structure
+### Installation
 
 ```bash
-src/
- ├── components/
- ├── pages/
- ├── layouts/
- ├── routes/
- ├── context/
- ├── firebase/
- ├── services/
- ├── utils/
- ├── hooks/
- ├── assets/
- └── styles/
+git clone https://github.com/GYASH28/CAMPUSMATE.git
+cd CAMPUSMATE
+npm install
+npm run dev
+```
+
+Open the local URL printed by Vite.
+
+### Production Build
+
+```bash
+npm run build
+npm run preview
+```
+
+### Code Quality
+
+```bash
+npm run lint
+```
+
+## Firebase Setup
+
+Create a Firebase project and configure the application with your own Firebase web credentials. Never commit service-account credentials, private keys, or unrestricted secrets to the repository.
+
+For a production deployment, configure appropriate Firestore and Storage security rules for every user role.
+
+## Progressive Web App
+
+CampusMate is designed to work as an installable web app, allowing users to add it to a phone or desktop home screen while keeping a responsive browser experience.
+
+## Design Direction
+
+- Futuristic dark visual language
+- Glass-inspired cards and layered surfaces
+- Blue and purple accent gradients
+- Smooth transitions and feedback states
+- Mobile-first dashboard adaptation
+- Clear role and status communication
+
+## Product Vision
+
+CampusMate aims to become a practical digital layer for college life: simple enough for daily attendance and notices, but powerful enough to support analytics, academic planning, AI assistance, and institution-wide workflows.
+
+## License
+
+This project is currently maintained as a personal product project. Please contact the repository owner before redistributing the full product or branding.
